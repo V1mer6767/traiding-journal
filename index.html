@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crypto Trading Journal</title>
+  <meta name="theme-color" content="#0b4aa2" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">₿</div>
+      <div>
+        <div class="title">Trading Journal</div>
+        <div class="subtitle">прогрес • позиції • аналітика</div>
+      </div>
+    </div>
+    <button id="btnExport" class="btn ghost">Експорт</button>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <div class="card">
+        <div class="cardHead">
+          <h2>Додати позицію</h2>
+          <div class="hint">P&L і результат % рахуються автоматично</div>
+        </div>
+
+        <form id="tradeForm" class="form">
+          <div class="row2">
+            <div class="field">
+              <label>Тікер</label>
+              <input id="symbol" placeholder="BTCUSDT" maxlength="20" required />
+            </div>
+            <div class="field">
+              <label>Тип</label>
+              <select id="side">
+                <option value="LONG">LONG</option>
+                <option value="SHORT">SHORT</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Дата/час входу</label>
+              <input id="entryTime" type="datetime-local" />
+            </div>
+            <div class="field">
+              <label>Дата/час виходу</label>
+              <input id="exitTime" type="datetime-local" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Entry ($)</label>
+              <input id="entry" type="number" step="0.0001" placeholder="42000" />
+            </div>
+            <div class="field">
+              <label>Exit ($)</label>
+              <input id="exit" type="number" step="0.0001" placeholder="43000" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Size (кількість монет)</label>
+              <input id="size" type="number" step="0.0001" placeholder="0.01" />
+            </div>
+            <div class="field">
+              <label>Комісія ($)</label>
+              <input id="fee" type="number" step="0.01" placeholder="2" value="0" />
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Стратегія (опц.)</label>
+              <input id="strategy" placeholder="Breakout / Scalping / ..." />
+            </div>
+            <div class="field">
+              <label>Біржа (опц.)</label>
+              <input id="exchange" placeholder="Binance" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Нотатки (опц.)</label>
+            <textarea id="notes" placeholder="Причина входу / помилка / емоції..."></textarea>
+          </div>
+
+          <div class="row2">
+            <button class="btn primary" type="submit">Додати</button>
+            <button class="btn danger" id="btnClearAll" type="button">Очистити все</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="cardHead">
+          <h2>Аналітика</h2>
+          <div class="pill" id="storagePill">local</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Загальний P&L</div>
+            <div class="v" id="totalPnl">$0.00</div>
+          </div>
+          <div class="stat">
+            <div class="k">Winrate</div>
+            <div class="v" id="winrate">0%</div>
+          </div>
+          <div class="stat">
+            <div class="k">Угод</div>
+            <div class="v" id="tradesCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Profit Factor</div>
+            <div class="v" id="profitFactor">0.00</div>
+          </div>
+          <div class="stat">
+            <div class="k">Середній результат</div>
+            <div class="v" id="avgResult">0%</div>
+          </div>
+          <div class="stat">
+            <div class="k">Загальний результат</div>
+            <div class="v" id="totalResult">0%</div>
+          </div>
+        </div>
+
+        <div class="chartCard">
+          <div class="chartHead">
+            <div>
+              <div class="chartTitle">Equity Curve</div>
+              <div class="chartSub">накопичений результат по угодах</div>
+            </div>
+            <select id="chartMode" class="selectSmall">
+              <option value="cum">Cumulative</option>
+              <option value="pertrade">Per-trade</option>
+            </select>
+          </div>
+          <canvas id="equityChart" height="160"></canvas>
+        </div>
+
+        <div class="chartCard">
+          <div class="chartHead">
+            <div>
+              <div class="chartTitle">Результат по періодах</div>
+              <div class="chartSub">групування по даті виходу (або входу)</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <select id="periodMode" class="selectSmall" title="Період">
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+              </select>
+              <select id="periodMetric" class="selectSmall" title="Метрика">
+                <option value="pnl">P&L ($)</option>
+                <option value="pct">Result (%)</option>
+              </select>
+            </div>
+          </div>
+          <canvas id="periodChart" height="170"></canvas>
+        </div>
+
+        <div class="chartCard">
+          <div class="chartHead">
+            <div>
+              <div class="chartTitle">Розподіл LONG/SHORT</div>
+              <div class="chartSub">кількість позицій</div>
+            </div>
+          </div>
+          <canvas id="sideChart" height="140"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead">
+        <h2>Позиції</h2>
+        <div class="toolbar">
+          <input id="search" class="search" placeholder="Пошук: BTC, стратегія, біржа..." />
+          <select id="filterSide" class="selectSmall">
+            <option value="ALL">Усі</option>
+            <option value="LONG">LONG</option>
+            <option value="SHORT">SHORT</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tableWrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Тікер</th>
+              <th>Тип</th>
+              <th class="right">P&L</th>
+              <th class="right">Результат</th>
+              <th class="muted">Вхід → Вихід</th>
+              <th class="muted">Стратегія</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tradesBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footNote">
+        Результат % = P&L / (Entry × Size) × 100
+      </div>
+    </section>
+  </main>
+
+  <input id="fileImport" type="file" accept="application/json" hidden />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+  </script>
+</body>
+</html>

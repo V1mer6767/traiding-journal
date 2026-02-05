@@ -1,0 +1,11 @@
+{
+  "name": "Crypto Trading Journal",
+  "short_name": "TradeJournal",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f9ff",
+  "theme_color": "#0b4aa2",
+  "icons": [
+   
+  ]
+}
